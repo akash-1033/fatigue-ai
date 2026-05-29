@@ -338,32 +338,58 @@ export default function FatiguePlatform() {
     };
 
     try {
-      const res = await fetch(`${BACKEND_URL}/predict/fatigue`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+  const fetchPromise = fetch(`${BACKEND_URL}/predict/fatigue`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.detail || `Backend error ${res.status}`);
-      }
-      console.log("BACKEND RESPONSE:", data);
-      setResults(data);
-      setStep(6);
-    } catch (error) {
-      console.error("Prediction request failed:", error);
-      // Fallback to mock results when backend is not reachable.
-      const base = 5.3 + Math.random() * 1.3;
-      setResults({
-        lstm: { log: parseFloat((base + (Math.random() - 0.5) * .2).toFixed(3)), conf: 91 + Math.floor(Math.random() * 7), time: 18 + Math.floor(Math.random() * 8) },
-        gru: { log: parseFloat((base + (Math.random() - 0.5) * .2).toFixed(3)), conf: 87 + Math.floor(Math.random() * 8), time: 13 + Math.floor(Math.random() * 6) },
-        cnn: { log: parseFloat((base + (Math.random() - 0.5) * .2).toFixed(3)), conf: 84 + Math.floor(Math.random() * 8), time: 9 + Math.floor(Math.random() * 5) },
-      });
-      setStep(6);
-    } finally {
-      setRunning(false);
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error("Request timeout")), 15000)
+  );
+
+  const res = await Promise.race([fetchPromise, timeoutPromise]);
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.detail || `Backend error ${res.status}`);
+  }
+
+  console.log("BACKEND RESPONSE:", data);
+
+  setResults(data);
+  setStep(6);
+
+} catch (error) {
+
+  console.warn("Using demo data:", error);
+
+  const base = 5.3 + Math.random() * 1.3;
+
+  setResults({
+    lstm: {
+      log: parseFloat((base + (Math.random() - 0.5) * 0.2).toFixed(3)),
+      conf: 92,
+      time: 22
+    },
+    gru: {
+      log: parseFloat((base + (Math.random() - 0.5) * 0.2).toFixed(3)),
+      conf: 89,
+      time: 18
+    },
+    cnn: {
+      log: parseFloat((base + (Math.random() - 0.5) * 0.2).toFixed(3)),
+      conf: 87,
+      time: 15
     }
+  });
+
+  setStep(6);
+
+} finally {
+  setRunning(false);
+}
   };
 
   const activeR = results ? results[selMod.toLowerCase()] : null;
