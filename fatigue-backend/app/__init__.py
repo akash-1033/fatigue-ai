@@ -1,0 +1,1 @@
+"""FatigueAI backend package."""

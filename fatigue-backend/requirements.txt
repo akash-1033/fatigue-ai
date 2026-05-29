@@ -1,0 +1,47 @@
+# =========================
+# FastAPI Backend
+# =========================
+
+fastapi
+uvicorn[standard]
+python-multipart
+aiofiles
+
+# =========================
+# Deep Learning
+# =========================
+
+torch==2.11.0
+torchvision==0.26.0
+torchaudio==2.11.0
+
+# =========================
+# Data Processing
+# =========================
+
+numpy
+pandas
+scipy
+scikit-learn
+joblib
+
+# =========================
+# Validation & Config
+# =========================
+
+pydantic
+pydantic-settings
+python-dotenv
+
+# =========================
+# Report Generation
+# =========================
+
+reportlab
+Pillow
+
+# =========================
+# Utilities
+# =========================
+
+requests
